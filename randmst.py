@@ -180,7 +180,7 @@ class Graph:
                             if (x > (vX + k)) or (x < (vX - k)) or (y > (vY + k)) or (y < (vY - k)) or (z > (vZ + k)) or (z < (vZ - k)) or (p4 > (vP4 + k)) or (p4 < (vP4 - k)):
                                 continue
                         
-                        # Calculate cost and add to PQ (only if it's not in our MST and if our weight is below pruning value)
+                        # Calculate weight and add to PQ (only if it's not in our MST and if our weight is below pruning value)
                         if (vertex not in MST):
                             weight = math.dist(vMin.coordinates, vertex)
                             if weight <= k:
@@ -319,12 +319,12 @@ def main():
         
         print("trial :" + str(trial))
         weight_from_one_trial = get_weight(n, dim, k)
-        print("cost from one trial", weight_from_one_trial)
+        print("total MST weight from one trial", weight_from_one_trial)
         total_min_weight_count +=  weight_from_one_trial
-        print("total cost ", total_min_weight_count)
+        print("total weight ", total_min_weight_count)
         
     average_weight = total_min_weight_count/numtrials
-    print("average cost: ", average_weight)
+    print("average total MST weight: ", average_weight)
     print(str(average_weight) + " " + " " + str(n) + " " + str(numtrials) + " " + str(dim))
     print("--- %s total seconds ---" % (time.time() - start_time))
     print("--- %s average seconds per trial ---" % ((time.time() - start_time)/numtrials))

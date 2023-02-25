@@ -7,6 +7,8 @@ import threading
 from collections.abc import MutableMapping
 
 
+# Write in writeup that after futerhr eserach we decided not to use fib heap because it takes up too much memory
+
 class heapdict(MutableMapping):
     __marker = object()
 
@@ -93,31 +95,27 @@ class heapdict(MutableMapping):
     def __len__(self):
         return len(self.d)
 
-    def peekitem(self):
-        """D.peekitem() -> (k, v), return the (key, value) pair with lowest value;\n but raise KeyError if D is empty."""
-        return (self.heap[0][1], self.heap[0][0])
-
 
 
 #Timer for testing
 start_time = time.time()
 
 class Node:
-    def __init__(self, arg_id):
-        self._id = arg_id
+    def __init__(self, argcoordinates):
+        self.coordinates = argcoordinates
 
 class Graph:
-    def __init__(self, source : int, adj_list : Dict[int, List[int]]) :
+    def __init__(self, source, vertices) :
         self.source = source
-        self.vertices = adj_list
+        self.vertices = vertices
 
-
-    def PrimsMST (self) -> int :
+    def PrimsMST(self, k):
         
         source = Node(self.source)
-
         priority_queue = heapdict()
         priority_queue[source] = 0
+
+        # Optimization?
         added = {}
         
         for vertex in self.vertices:
@@ -128,26 +126,29 @@ class Graph:
             # Choose and "pop" the adjacent node with the least edge cost
             (node, cost) = priority_queue.popitem()
 
-            if added[node._id] == False :
+            if added[node.coordinates] == False :
                 MST_cost += cost
-                added[node._id] = True
+                added[node.coordinates] = True
 
                 for vertex in self.vertices :
-                    # for every vertex in the set of vertices EXCEPT for node._id (itself)
-                    if vertex == node._id:
+                    # for every vertex in the set of vertices EXCEPT for node.coordinates (itself)
+                    if vertex == node.coordinates:
                         continue
                     # Only look at vertices that are not in our MST
                     if added[vertex] == False :
 
                         # Calculate cost and add to PQ
-                        cost = math.dist(node._id, vertex)
-                        priority_queue[Node(vertex)] = cost
+                        cost = math.dist(node.coordinates, vertex)
+
+                        # Only add cost if it is less than our pruning - k value
+                        if cost <= k:
+                            priority_queue[Node(vertex)] = cost
         return MST_cost
 
 
 
 
-def get_cost(n, dim) -> int:
+def get_cost(n, dim, k) -> int:
     vertices = []
 
     if (dim == 1):
@@ -191,18 +192,34 @@ def get_cost(n, dim) -> int:
     
 
     g1 = Graph(source, vertices)
-    cost = g1.PrimsMST()
+    cost = g1.PrimsMST(k)
     return cost
 
 def main(): #need to implement number of trials still
 
     n, numtrials, dim = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-    
+    k_values = {}
+    k_values[(128,5, 3)] = 0.36
+    k_values[(256,5, 3)] = 0.28
+    k_values[(512,5, 3)] = 0.22
+    k_values[(1024,5, 3)] = 0.18
+    k_values[(2048,5, 3)] = 0.15
+    k_values[(4096,5, 3)] = 0.11
+    k_values[(8192,5, 3)] = 0.08
+    k_values[(16384,5, 3)] = 0.06
+    k_values[(32768,5, 3)] = 0.05
+    k_values[(65536,5, 3)] = 0.045
+    k_values[(131072,5, 3)] = 0.035
+    k_values[(262144,5, 3)] = 0.02
+
+    k = k_values[(n, numtrials, dim)]
+
+
     total_min_cost_count = 0
     for trial in range(numtrials):
         
         print("trial :" + str(trial))
-        cost_from_one_trial = get_cost(n, dim)
+        cost_from_one_trial = get_cost(n, dim, k)
         print("cost from one trial", cost_from_one_trial)
         total_min_cost_count +=  cost_from_one_trial
         print("total cost ", total_min_cost_count)

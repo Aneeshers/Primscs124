@@ -117,34 +117,34 @@ class Graph:
         priority_queue[source] = 0
 
         MST = set()
-        MST_cost = 0
+        MST_weight = 0
 
         while priority_queue :
-            # "pop" the vertex with the least edge cost in our PQ
-            (vMin, cost) = priority_queue.pop()
+            # "pop" the vertex with the least edge weight in our PQ
+            (vMin, weight) = priority_queue.pop()
 
             # Dim 0 is slightly different than the other higher dims
             if d == 0:
                 coordinates = vMin.coordinates[0]
                 if coordinates not in MST :
-                    MST_cost += cost
+                    MST_weight += weight
                     MST.add(coordinates)
         
                     for vertex in self.vertices :
                         # for every vertex in the set of vertices EXCEPT for vMin.coordinates (itself)
                         if vertex == vMin.coordinates:
                             continue
-                        cost = random.random()
-                        if cost <= k:
+                        weight = random.random()
+                        if weight <= k:
 
-                            # If below pruning cost, and NOT in MST, add to our PQ
+                            # If below pruning weight, and NOT in MST, add to our PQ
                             if (vertex[0] not in MST):
-                                priority_queue[Vertex(vertex)] = cost
+                                priority_queue[Vertex(vertex)] = weight
 
             # Higher dim
             else:
                 if vMin.coordinates not in MST :
-                    MST_cost += cost
+                    MST_weight += weight
                     MST.add(vMin.coordinates)
 
                     for vertex in self.vertices :
@@ -157,7 +157,7 @@ class Graph:
                             (vX,vY) = vMin.coordinates
                             
                             # Generate a k-bounded box around our vMin vertex
-                            # Then prefilter weights before even calculating cost -- that is, skip vertices that are outside of our k-cost
+                            # Then prefilter weights before even calculating weight -- that is, skip vertices that are outside of our k-weight
                             if (x > (vX + k)) or (x < (vX - k)) or (y > (vY + k)) or (y < (vY - k)):
                                 continue
 
@@ -167,7 +167,7 @@ class Graph:
                             (vX,vY,vZ) = vMin.coordinates
                             
                             # Generate a k-bounded cube around our vMin vertex
-                            # Then prefilter weights before even calculating cost -- that is, skip vertices that are outside of our k-cost
+                            # Then prefilter weights before even calculating weight -- that is, skip vertices that are outside of our k-weight
                             if (x > (vX + k)) or (x < (vX - k)) or (y > (vY + k)) or (y < (vY - k)) or (z > (vZ + k)) or (z < (vZ - k)):
                                 continue
                         
@@ -176,20 +176,20 @@ class Graph:
                             (vX,vY,vZ,vP4) = vMin.coordinates
                             
                             # Generate a k-bounded hypercube around our vMin vertex
-                            # Then prefilter weights before even calculating cost -- that is, skip vertices that are outside of our k-cost
+                            # Then prefilter weights before even calculating weight -- that is, skip vertices that are outside of our k-weight
                             if (x > (vX + k)) or (x < (vX - k)) or (y > (vY + k)) or (y < (vY - k)) or (z > (vZ + k)) or (z < (vZ - k)) or (p4 > (vP4 + k)) or (p4 < (vP4 - k)):
                                 continue
                         
-                        # Calculate cost and add to PQ (only if it's not in our MST and if our cost is below pruning value)
+                        # Calculate cost and add to PQ (only if it's not in our MST and if our weight is below pruning value)
                         if (vertex not in MST):
-                            cost = math.dist(vMin.coordinates, vertex)
-                            if cost <= k:
-                                priority_queue[Vertex(vertex)] = cost
-        return MST_cost
+                            weight = math.dist(vMin.coordinates, vertex)
+                            if weight <= k:
+                                priority_queue[Vertex(vertex)] = weight
+        return MST_weight
 
 
 
-def get_cost(n, dim, k) -> int:
+def get_weight(n, dim, k) -> int:
     vertices = []
 
     if (dim == 0):
@@ -233,8 +233,8 @@ def get_cost(n, dim, k) -> int:
     
 
     g1 = Graph(source, vertices)
-    cost = g1.prims(k, dim)
-    return cost
+    weight = g1.prims(k, dim)
+    return weight
 
 def main():
 
@@ -314,18 +314,18 @@ def main():
     else:
         k = 1
 
-    total_min_cost_count = 0
+    total_min_weight_count = 0
     for trial in range(numtrials):
         
         print("trial :" + str(trial))
-        cost_from_one_trial = get_cost(n, dim, k)
-        print("cost from one trial", cost_from_one_trial)
-        total_min_cost_count +=  cost_from_one_trial
-        print("total cost ", total_min_cost_count)
+        weight_from_one_trial = get_weight(n, dim, k)
+        print("cost from one trial", weight_from_one_trial)
+        total_min_weight_count +=  weight_from_one_trial
+        print("total cost ", total_min_weight_count)
         
-    average_cost = total_min_cost_count/numtrials
-    print("average cost: ", average_cost)
-    print(str(average_cost) + " " + " " + str(n) + " " + str(numtrials) + " " + str(dim))
+    average_weight = total_min_weight_count/numtrials
+    print("average cost: ", average_weight)
+    print(str(average_weight) + " " + " " + str(n) + " " + str(numtrials) + " " + str(dim))
     print("--- %s total seconds ---" % (time.time() - start_time))
     print("--- %s average seconds per trial ---" % ((time.time() - start_time)/numtrials))
 
